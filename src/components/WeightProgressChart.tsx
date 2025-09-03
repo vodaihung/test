@@ -13,8 +13,8 @@ const WeightProgressChart: React.FC<WeightProgressChartProps> = ({
   currentWeight,
   goalWeight
 }) => {
-  // Static mock data for the chart
-  const staticChartData = [
+  // Original data points for weight progression
+  const originalWeightData = [
     { week: 1, weight: 250, target: 180, label: 'Week 1' },
     { week: 2, weight: 247, target: 180, label: 'Week 2' },
     { week: 3, weight: 244, target: 180, label: 'Week 3' },
@@ -29,12 +29,50 @@ const WeightProgressChart: React.FC<WeightProgressChartProps> = ({
     { week: 12, weight: 190, target: 180, label: 'Week 12' },
     { week: 13, weight: 186, target: 180, label: 'Week 13' },
     { week: 14, weight: 184, target: 180, label: 'Week 14' },
-    { week: 15, weight: 182, target: 180, label: 'Week 15' },
-    { week: 16, weight: 181, target: 180, label: 'Week 16' },
-    { week: 17, weight: 180.5, target: 180, label: 'Week 17' },
-    { week: 18, weight: 180.2, target: 180, label: 'Week 18' },
+    { week: 15, weight: 183, target: 180, label: 'Week 15' },
+    { week: 16, weight: 182.3, target: 180, label: 'Week 16' },
+    { week: 17, weight: 181, target: 180, label: 'Week 17' },
+    { week: 18, weight: 180.5, target: 180, label: 'Week 18' },
     { week: 19, weight: 180, target: 180, label: 'Week 19' },
   ];
+
+  // Linear interpolation function for perfectly smooth straight-line transitions
+  const interpolateWeightDataLinear = (originalData: typeof originalWeightData, pointsPerSegment: number = 8) => {
+    const interpolatedData = [];
+    
+    for (let i = 0; i < originalData.length - 1; i++) {
+      const current = originalData[i];
+      const next = originalData[i + 1];
+      
+      // Add the current original point
+      interpolatedData.push(current);
+      
+      // Calculate intermediate points using pure linear interpolation
+      for (let j = 1; j < pointsPerSegment; j++) {
+        const t = j / pointsPerSegment;
+        const weekInterpolated = current.week + (next.week - current.week) * t;
+        
+        // Pure linear weight interpolation - no easing, perfectly straight lines
+        const weightDifference = next.weight - current.weight;
+        const weightInterpolated = current.weight + weightDifference * t;
+        
+        interpolatedData.push({
+          week: weekInterpolated,
+          weight: weightInterpolated,
+          target: 180,
+          label: `Week ${weekInterpolated.toFixed(1)}`
+        });
+      }
+    }
+    
+    // Add the final point
+    interpolatedData.push(originalData[originalData.length - 1]);
+    
+    return interpolatedData;
+  };
+
+  // Generate ultra-smooth linear data with 8 interpolated points between each original measurement
+  const staticChartData = interpolateWeightDataLinear(originalWeightData, 8);
 
   return (
     <div className="relative w-full h-full">
@@ -88,7 +126,7 @@ const WeightProgressChart: React.FC<WeightProgressChartProps> = ({
 
           {/* Main line with glow */}
           <Line
-            type="monotone"
+            type="linear"
             dataKey="weight"
             stroke="url(#lineGradient)"
             strokeWidth={3}
@@ -99,7 +137,7 @@ const WeightProgressChart: React.FC<WeightProgressChartProps> = ({
 
           {/* Additional glow layer */}
           <Line
-            type="monotone"
+            type="linear"
             dataKey="weight"
             stroke="rgba(255, 255, 255, 0.4)"
             strokeWidth={6}

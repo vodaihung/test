@@ -19,6 +19,7 @@ import TestimonialStep from '../components/TestimonialStep';
 import StateSelectionStep from '../components/StateSelectionStep';
 import MedicationIntroStep from '../components/MedicationIntroStep';
 import MedicalConditionsStep from '../components/MedicalConditionsStep';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 
 export default function Home() {
@@ -183,7 +184,11 @@ export default function Home() {
   };
 
   return (
-    <div className={getBackgroundClass()}>
+    <div className={`relative ${getBackgroundClass()}`}>
+      {/* Animated Background for purple steps */}
+      {(currentStep === 5 || currentStep === 10 || currentStep === 11 || currentStep === 13) && (
+        <AnimatedBackground variant="purple" intensity="medium" />
+      )}
       {/* Mobile Layout */}
       <div className="md:hidden flex flex-col min-h-screen p-6 pb-8">
         {/* Header with Logo and Progress */}
