@@ -35,8 +35,7 @@ export default function Home() {
     setGender,
     setDateOfBirth,
     setBMIData,
-    setGoalWeight,
-    setMedicalConditions
+    setGoalWeight
   } = useFormStore();
 
   // Local UI state

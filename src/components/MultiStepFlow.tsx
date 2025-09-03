@@ -49,7 +49,7 @@ const MultiStepFlow: React.FC<MultiStepFlowProps> = ({
         return (
           <div className="flex flex-col items-center justify-center h-full text-white">
             <h1 className="text-2xl font-bold mb-4">Flow Complete!</h1>
-            <p className="text-lg mb-6">You've completed all steps.</p>
+            <p className="text-lg mb-6">You&apos;ve completed all steps.</p>
             <button
               onClick={() => setCurrentStep(1)}
               className="px-6 py-3 bg-white text-purple-600 rounded-full font-medium hover:bg-white/90 transition-all"

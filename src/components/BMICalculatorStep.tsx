@@ -96,7 +96,7 @@ const BMICalculatorStep: React.FC<BMICalculatorStepProps> = ({ onNext }) => {
           {/* Title and Description */}
           <div className="flex flex-col w-full gap-3">
             <h1 className="text-[#282828] font-medium text-2xl md:text-[32px] leading-[1.17] md:leading-[1.125] tracking-[-0.03em] font-syne">
-              Let's calculate your BMI.
+              Let&apos;s calculate your BMI.
             </h1>
             <p className="text-[#676767] font-normal text-sm md:text-base leading-[1.14] md:leading-[1.25] font-overused">
               Body Mass Index (BMI) helps determine eligibility for weight loss medication and assess weight-related health risks.

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Line, XAxis, YAxis, ResponsiveContainer, ReferenceDot, Area, AreaChart } from 'recharts';
+import { Line, XAxis, YAxis, ResponsiveContainer, ReferenceDot, AreaChart } from 'recharts';
 
 interface WeightProgressChartProps {
   currentWeight: string;
