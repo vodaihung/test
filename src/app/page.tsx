@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useFormStore } from '../store/formStore';
 import Logo from '../components/Logo';
 import ProgressBar from '../components/ProgressBar';
 import BackButton from '../components/BackButton';
@@ -18,14 +19,30 @@ import TestimonialStep from '../components/TestimonialStep';
 import StateSelectionStep from '../components/StateSelectionStep';
 import MedicationIntroStep from '../components/MedicationIntroStep';
 import MedicalConditionsStep from '../components/MedicalConditionsStep';
-import ThyroidCancerTypeStep from '../components/ThyroidCancerTypeStep';
+
 
 export default function Home() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+  // Zustand store
+  const {
+    currentStep,
+    formData,
+    setCurrentStep,
+    navigateToStep,
+    setWeightLossGoals,
+    setWeightLossChallenges,
+    setWeightLossHistory,
+    setWeightLossExperience,
+    setGender,
+    setDateOfBirth,
+    setBMIData,
+    setGoalWeight,
+    setMedicalConditions
+  } = useFormStore();
+
+  // Local UI state
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [stepHistory, setStepHistory] = useState<number[]>([1]); // Track navigation history
-  const totalSteps = 15; // 15 steps total (step 3 is conditional)
+  const totalSteps = 14; // 14 steps total (step 3 is conditional)
 
   const handleBackButton = () => {
     if (stepHistory.length > 1) {
@@ -43,123 +60,118 @@ export default function Home() {
     }
   };
 
-  const navigateToStep = (nextStep: number) => {
+  const handleNavigateToStep = (nextStep: number) => {
     setIsTransitioning(true);
 
     setTimeout(() => {
       setStepHistory(prev => [...prev, nextStep]);
-      setCurrentStep(nextStep);
+      navigateToStep(nextStep);
       setTimeout(() => setIsTransitioning(false), 50);
     }, 300);
   };
 
   const handleWeightLossGoalsComplete = (selectedOption: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'goals': selectedOption }));
+    setWeightLossGoals([selectedOption]); // Convert to array for consistency
     console.log('Weight Loss Goals completed with:', selectedOption);
-    navigateToStep(2);
+    handleNavigateToStep(2);
   };
 
   const handleWeightLossExperienceComplete = (selectedOption: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'experience': selectedOption }));
+    setWeightLossExperience(selectedOption);
     console.log('Weight Loss Experience completed with:', selectedOption);
 
     // Conditional logic: if "Yes", go to history step (3), if "No", go to challenges step (4)
     if (selectedOption === 'Yes') {
-      navigateToStep(3); // Go to weight loss history step
+      handleNavigateToStep(3); // Go to weight loss history step
     } else {
-      navigateToStep(4); // Skip to challenges step
+      handleNavigateToStep(4); // Skip to challenges step
     }
   };
 
   const handleWeightLossHistoryComplete = (selectedOption: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'history': selectedOption }));
+    setWeightLossHistory(selectedOption);
     console.log('Weight Loss History completed with:', selectedOption);
 
     // After history, go to challenges step
-    navigateToStep(4);
+    handleNavigateToStep(4);
   };
 
   const handleWeightLossChallengesComplete = (selectedOption: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'challenges': selectedOption }));
+    setWeightLossChallenges([selectedOption]); // Convert to array for consistency
     console.log('Weight Loss Challenges completed with:', selectedOption);
 
     // Go to medication info step
-    navigateToStep(5);
+    handleNavigateToStep(5);
   };
 
   const handleMedicationInfoComplete = () => {
     console.log('Medication Info step completed');
     // Go to gender selection step
-    navigateToStep(6);
+    handleNavigateToStep(6);
   };
 
   const handleGenderSelectionComplete = (selectedGender: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'gender': selectedGender }));
+    setGender(selectedGender);
     console.log('Gender Selection completed with:', selectedGender);
     // Go to date of birth step
-    navigateToStep(7);
+    handleNavigateToStep(7);
   };
 
   const handleDateOfBirthComplete = (dateOfBirth: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'dateOfBirth': dateOfBirth }));
+    // Parse MM-DD-YYYY format
+    const [month, day, year] = dateOfBirth.split('-');
+    setDateOfBirth(month, day, year);
     console.log('Date of Birth completed with:', dateOfBirth);
     // Go to BMI calculator step
-    navigateToStep(8);
+    handleNavigateToStep(8);
   };
 
   const handleBMICalculatorComplete = (bmiData: { feet: string; inches: string; weight: string; bmi: number; category: string }) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      'height_feet': bmiData.feet,
-      'height_inches': bmiData.inches,
-      'weight': bmiData.weight,
-      'bmi': bmiData.bmi.toString(),
-      'bmi_category': bmiData.category
-    }));
+    setBMIData(
+      { feet: bmiData.feet, inches: bmiData.inches },
+      bmiData.weight,
+      bmiData.bmi
+    );
     console.log('BMI Calculator completed with:', bmiData);
     // Go to goal weight step
-    navigateToStep(9);
+    handleNavigateToStep(9);
   };
 
   const handleGoalWeightComplete = (goalWeight: string) => {
-    setSelectedAnswers(prev => ({ ...prev, 'goalWeight': goalWeight }));
+    setGoalWeight(goalWeight);
     console.log('Goal Weight completed with:', goalWeight);
     // Go to goal weight visualization step
-    navigateToStep(10);
+    handleNavigateToStep(10);
   };
 
   const handleGoalWeightVisualizationComplete = () => {
     console.log('Goal Weight Visualization completed');
     // Go to testimonial step
-    navigateToStep(11);
+    handleNavigateToStep(11);
   };
 
   const handleTestimonialComplete = () => {
     console.log('Testimonial step completed');
     // Go to state selection step
-    navigateToStep(12);
+    handleNavigateToStep(12);
   };
 
   const handleStateSelectionComplete = () => {
+    // Note: StateSelectionStep doesn't pass selected state, need to update component
     console.log('State selection step completed');
     // Go to medication intro step
-    navigateToStep(13);
+    handleNavigateToStep(13);
   };
 
   const handleMedicationIntroComplete = () => {
     console.log('Medication intro step completed');
     // Go to medical conditions step
-    navigateToStep(14);
+    handleNavigateToStep(14);
   };
 
   const handleMedicalConditionsComplete = () => {
+    // Note: MedicalConditionsStep doesn't pass selected conditions, need to update component
     console.log('Medical conditions step completed');
-    // Go to thyroid cancer type step
-    navigateToStep(15);
-  };
-
-  const handleThyroidCancerTypeComplete = () => {
-    console.log('Thyroid cancer type step completed');
     // Final step for now
   };
 
@@ -210,8 +222,8 @@ export default function Home() {
             {currentStep === 9 && <GoalWeightStep onNext={handleGoalWeightComplete} />}
             {currentStep === 10 && (
               <GoalWeightVisualizationStep
-                goalWeight={selectedAnswers.goalWeight || "170"}
-                currentWeight={selectedAnswers.weight || "250"}
+                goalWeight={formData.goalWeight || "170"}
+                currentWeight={formData.bmiData.weight || "250"}
                 onNext={handleGoalWeightVisualizationComplete}
               />
             )}
@@ -219,7 +231,6 @@ export default function Home() {
             {currentStep === 12 && <StateSelectionStep onNext={handleStateSelectionComplete} />}
             {currentStep === 13 && <MedicationIntroStep onNext={handleMedicationIntroComplete} />}
             {currentStep === 14 && <MedicalConditionsStep onNext={handleMedicalConditionsComplete} />}
-            {currentStep === 15 && <ThyroidCancerTypeStep onNext={handleThyroidCancerTypeComplete} />}
           </div>
         </div>
       </div>
@@ -253,8 +264,8 @@ export default function Home() {
                   {currentStep === 5 && <MedicationInfoStep onNext={handleMedicationInfoComplete} />}
                   {currentStep === 10 && (
                     <GoalWeightVisualizationStep
-                      goalWeight={selectedAnswers.goalWeight || "170"}
-                      currentWeight={selectedAnswers.weight || "250"}
+                      goalWeight={formData.goalWeight || "170"}
+                      currentWeight={formData.bmiData.weight || "250"}
                       onNext={handleGoalWeightVisualizationComplete}
                     />
                   )}
@@ -296,7 +307,6 @@ export default function Home() {
                   {currentStep === 9 && <GoalWeightStep onNext={handleGoalWeightComplete} />}
                   {currentStep === 12 && <StateSelectionStep onNext={handleStateSelectionComplete} />}
                   {currentStep === 14 && <MedicalConditionsStep onNext={handleMedicalConditionsComplete} />}
-                  {currentStep === 15 && <ThyroidCancerTypeStep onNext={handleThyroidCancerTypeComplete} />}
                 </div>
               </div>
             </div>
